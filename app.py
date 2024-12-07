@@ -113,24 +113,33 @@ def generate():
         if not resume_file.filename.lower().endswith('.pdf'):
             return jsonify({'error': 'File must be a PDF'}), 400
 
-        # Extract text from PDF
-        resume_text = builder.extract_text_from_pdf(resume_file)
+        try:
+            # Extract text from PDF
+            resume_text = builder.extract_text_from_pdf(resume_file)
+        except Exception as e:
+            app.logger.error(f"PDF extraction error: {str(e)}")
+            return jsonify({'error': 'Error reading PDF file. Please ensure it is a valid PDF.'}), 400
         
-        # Generate new documents
-        result = builder.generate_documents(resume_text, job_description)
+        try:
+            # Generate new documents
+            result = builder.generate_documents(resume_text, job_description)
+        except Exception as e:
+            app.logger.error(f"Document generation error: {str(e)}")
+            return jsonify({'error': 'Error generating documents. Please try again.'}), 500
         
         if 'error' in result:
+            app.logger.error(f"Generation result error: {result['error']}")
             return jsonify({'error': result['error']}), 500
             
         # Store generated documents in app config for download
         app.config['GENERATED_RESUME'] = result['resume']
         app.config['GENERATED_COVER'] = result['cover_letter']
         
-        return jsonify({'success': True})
+        return jsonify({'success': True, 'message': 'Documents generated successfully'})
         
     except Exception as e:
-        print(f"Error in /generate endpoint: {str(e)}")
-        return jsonify({'error': str(e)}), 500
+        app.logger.error(f"Unexpected error in /generate endpoint: {str(e)}")
+        return jsonify({'error': 'An unexpected error occurred. Please try again.'}), 500
 
 @app.route('/download/<doc_type>/docx', methods=['GET'])
 def download(doc_type):

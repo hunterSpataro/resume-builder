@@ -149,7 +149,7 @@
     </div>
 
     <script>
-        const API_BASE = 'https://resume-builder-wx01.onrender.com/';
+        const API_BASE = 'http://127.0.0.1:5000';
         const form = document.getElementById('resumeForm');
         const submitBtn = document.getElementById('submitBtn');
         const loading = document.getElementById('loading');
@@ -196,7 +196,20 @@
                     body: formData
                 });
                 
-                const data = await response.json();
+                let data;
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    try {
+                        data = await response.json();
+                    } catch (jsonError) {
+                        console.error('JSON parsing error:', jsonError);
+                        throw new Error('Error parsing server response');
+                    }
+                } else {
+                    const textResponse = await response.text();
+                    console.error('Unexpected response type:', contentType, textResponse);
+                    throw new Error('Unexpected response from server');
+                }
                 
                 if (!response.ok) {
                     throw new Error(data.error || 'An error occurred while generating documents');
@@ -206,6 +219,7 @@
                 output.style.display = 'block';
                 
             } catch (err) {
+                console.error('Request error:', err);
                 showError(err.message || 'An error occurred. Please try again.');
             } finally {
                 submitBtn.disabled = false;
