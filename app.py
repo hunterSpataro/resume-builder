@@ -49,74 +49,24 @@ class ResumeBuilder:
             Here is the job description:
             {job_description}
             
-            Please provide:
-            1. A tailored version of my resume (begin directly with the content):
+            Please provide a tailored version of my resume with these guidelines:
+            • Use existing resume content only, keeping all dates, titles, and company names exactly as shown
+            • Begin with name and contact details
+            • Include a focused 3-4 line professional summary highlighting relevant experience
+            • Reframe achievements to emphasize skills matching the job requirements
+            • Maintain all sections from original resume
+            • Present most relevant experiences first
+            • Use clear, ATS-friendly formatting
 
-            Format & Structure:
-               - Begin directly with my name and contact details (no title or introduction)
-               - Use clear, ATS-friendly formatting
-               - Maintain all original dates, company names, and job titles exactly as shown
-
-            Professional Summary (max 3-4 lines):
-               - Craft a compelling narrative that showcases my most relevant experiences for this role
-               - Focus on demonstrating the direct connection between my background and the job requirements
-               - Emphasize unique value propositions that set me apart for this specific position
-               - Keep the tone professional yet conversational
-
-            Experience Section:
-               - Reframe existing accomplishments to highlight skills and experiences most relevant to this role
-               - Prioritize achievements that directly align with the job requirements
-               - Maintain complete accuracy - no fabricated or enhanced experiences
-               - When rewording, focus on emphasizing transferable skills and relevant outcomes
-               - Use strong action verbs that align with the job description's key requirements
-
-            Additional Guidelines:
-               - Only use information present in my original resume
-               - Reorganize content to put the most relevant experiences first
-               - Ensure all claims are verifiable and based on my actual experience
-            
-            2. A cover letter that demonstrates genuine enthusiasm while maintaining professional polish:
-
-            Format & Structure:
-               - Include complete header with:
-                  * My full name (from my resume)
-                  * Company name and address
-                  * Date
-                  * Hiring manager's name/title (if provided)
-                  * My contact information (from my resume)
-               - Use standard business letter formatting
-               - Length: Approximately 220 words for the main content
-
-            Opening Paragraph:
-               - Begin with a warm yet professional greeting
-               - Introduce yourself and state the position of interest
-               - Include a compelling hook that shows genuine interest in the role and company
-               - Avoid generic openings or stating obvious information about the position
-
-            Body Paragraphs:
-               - Create a natural flow between your experience and the role requirements
-               - Highlight 2-3 specific achievements that directly relate to the position
-               - Demonstrate clear understanding of the company's needs and how you can address them
-               - Use storytelling elements to make your experience more engaging
-               - Balance confidence with humility
-               - Support claims with concrete examples and measurable results
-
-            Closing:
-               - Express genuine interest in discussing the opportunity further
-               - Include a clear call to action
-               - End with a professional but warm closing
-               - Maintain an optimistic and forward-looking tone
-
-            Style Guidelines:
-               - Write in a natural, conversational tone while maintaining professionalism
-               - Avoid clichés and generic phrases
-               - Use active voice and strong action verbs
-               - Ensure each paragraph flows smoothly into the next
-               - Strike a balance between expertise and approachability
-               - Show personality while remaining business-appropriate
-               - Demonstrate enthusiasm without appearing desperate
-            
-            Please start the cover letter section with exactly "COVER LETTER:" on its own line."""
+            After the resume, please add exactly "COVER LETTER:" on its own line, followed by a professional cover letter with these guidelines:
+            • Include standard business letter header with my contact details
+            • Open with a warm, professional introduction stating the target role
+            • Highlight 2-3 specific achievements from my resume that match the role
+            • Show clear understanding of company needs and how my experience addresses them
+            • Maintain natural flow between paragraphs
+            • Close with clear interest in next steps
+            • Write in a professional yet personable tone
+            • Keep length around 220 words for main content"""
 
             message = self.client.messages.create(
                 model="claude-3-5-sonnet-20241022",
