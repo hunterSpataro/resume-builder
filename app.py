@@ -11,7 +11,15 @@ from io import BytesIO
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+# Configure CORS
+CORS(app, resources={
+    r"/*": {
+        "origins": "*",
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization", "Accept"],
+        "max_age": 3600
+    }
+})
 
 class ResumeBuilder:
     def __init__(self):
@@ -195,11 +203,17 @@ def generate():
 @app.route('/download/<doc_type>/docx', methods=['GET'])
 def download(doc_type):
     try:
+        app.logger.info(f"Download requested for {doc_type}")
+        
         if doc_type not in ['resume', 'cover']:
+            app.logger.error(f"Invalid document type requested: {doc_type}")
             return jsonify({'error': 'Invalid document type'}), 400
         
-        content = app.config.get(f'GENERATED_{doc_type.upper()}', '')
+        content = app.config.get(f'GENERATED_{doc_type.upper()}')
+        app.logger.info(f"Retrieved content length: {len(content) if content else 'None'}")
+        
         if not content:
+            app.logger.error(f"No content found for {doc_type}")
             return jsonify({'error': 'No generated content found'}), 404
         
         # Create DOCX and serve
@@ -207,6 +221,8 @@ def download(doc_type):
         buffer = BytesIO()
         doc.save(buffer)
         buffer.seek(0)
+        
+        app.logger.info(f"Successfully created DOCX for {doc_type}")
         
         return send_file(
             buffer,
@@ -216,7 +232,7 @@ def download(doc_type):
         )
     
     except Exception as e:
-        print(f"Download error: {str(e)}")
+        app.logger.error(f"Download error for {doc_type}: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
