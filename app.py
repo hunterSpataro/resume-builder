@@ -11,7 +11,7 @@ from io import BytesIO
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app)
 
 class ResumeBuilder:
     def __init__(self):
@@ -39,77 +39,25 @@ class ResumeBuilder:
             {job_description}
             
             Please provide:
-            1. A tailored version of my resume, adhering to these specific guidelines (begin directly with the content):
-
-            Format & Structure:
-               - Begin directly with my name and contact details (no title or introduction)
-               - Use clear, ATS-friendly formatting
-               - Maintain all original dates, company names, and job titles exactly as shown
-
-            Professional Summary (max 3-4 lines):
-               - Craft a compelling narrative that showcases my most relevant experiences for this role
-               - Focus on demonstrating the direct connection between my background and the job requirements
-               - Emphasize unique value propositions that set me apart for this specific position
-               - Keep the tone professional yet conversational
-
-            Experience Section:
-               - Reframe existing accomplishments to highlight skills and experiences most relevant to this role
-               - Prioritize achievements that directly align with the job requirements
-               - Maintain complete accuracy - no fabricated or enhanced experiences
-               - When rewording, focus on emphasizing transferable skills and relevant outcomes
-               - Use strong action verbs that align with the job description's key requirements
-
-            Additional Guidelines:
-               - Only use information present in my original resume
-               - Reorganize content to put the most relevant experiences first
-               - Ensure all claims are verifiable and based on my actual experience
+            1. A tailored version of my resume. Important guidelines:
+               - Start directly with my name and contact information, DO NOT add any introduction or title
+               - Maintain strict accuracy - do not add or embellish any experiences that aren't in my original resume
+               - Only reorganize and emphasize existing experiences that align with the job requirements
+               - Keep all dates, titles, and company names exactly as they appear in the original
+               - Use clear, professional formatting that is ATS-friendly
             
-            2. A cover letter that demonstrates genuine enthusiasm while maintaining professional polish:
-
-            Format & Structure:
-               - Include complete header with:
-                  * My full name
-                  * My contact information
-                  * Date
-                  * Company name and posted job title
-                  * Hiring manager's name/title (if provided)
-                  
-               - Use standard business letter formatting
-               - Length: Approximately 220 words for the main content
-
-            Opening Paragraph:
-               - Begin with a warm yet professional greeting
-               - Introduce yourself and state the position of interest
-               - Include a compelling hook that shows genuine interest in the role and company
-               - Avoid generic openings or stating obvious information about the position
-
-            Body Paragraphs:
-               - Create a natural flow between your experience and the role requirements
-               - Highlight 2-3 specific achievements that directly relate to the position
-               - Demonstrate clear understanding of the company's needs and how you can address them
-               - Use storytelling elements to make your experience more engaging
-               - Balance confidence with humility
-               - Support claims with concrete examples and measurable results
-
-            Closing:
-               - Express genuine interest in discussing the opportunity further
-               - Include a clear call to action
-               - End with a professional but warm closing
-               - Maintain an optimistic and forward-looking tone
-
-            Style Guidelines:
-               - Write in a natural, conversational tone while maintaining professionalism
-               - Avoid clichés and generic phrases
-               - Use active voice and strong action verbs
-               - Ensure each paragraph flows smoothly into the next
-               - Strike a balance between expertise and approachability
-               - Show personality while remaining business-appropriate
-               - Demonstrate enthusiasm without appearing desperate
+            2. A cover letter that balances professionalism with authenticity:
+               - Maintain a consistently professional tone throughout
+               - Show genuine interest in the role while avoiding overly casual language
+               - Present a clear, logical connection between my experience and the role requirements
+               - Use confident, direct language that demonstrates competence and reliability
+               - Keep the opening and closing professional yet engaging
+               - Focus on concrete achievements and specific qualifications
             
             Please start the cover letter section with exactly "COVER LETTER:" on its own line."""
 
             message = self.client.messages.create(
-                model="claude-3-5-sonnet-20241022",
+                model="claude-3-opus-20240229",
                 max_tokens=1000,
                 temperature=0.1,
                 messages=[{"role": "user", "content": prompt}]
@@ -142,7 +90,7 @@ def create_docx(content):
 
 @app.route('/')
 def home():
-    return "Resume Builder Server is running!"
+    return render_template('index.html')
 
 @app.route('/generate', methods=['POST', 'OPTIONS'])
 def generate():
@@ -212,5 +160,10 @@ def download(doc_type):
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    print("\n=== Starting Resume Builder Server ===")
+    print("Server will run at: http://127.0.0.1:5000")
+    print("Make sure you have:")
+    print("1. Set your CLAUDE_API_KEY in .env file")
+    print("2. Installed all required packages")
+    print("=====================================\n")
+    app.run(host='127.0.0.1', port=5000, debug=True)
