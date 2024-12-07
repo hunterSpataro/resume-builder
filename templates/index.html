@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Builder</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --background-color: #f3f4f6;
+            --text-color: #1f2937;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: opacity 0.2s;
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .error {
+            color: #dc2626;
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        .output {
+            margin-top: 2rem;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Resume Builder</h1>
+        
+        <form id="resumeForm">
+            <div class="form-group">
+                <label for="resume">Upload Your Current Resume (PDF)</label>
+                <input type="file" id="resume" name="resume" accept=".pdf" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="jobDescription">Job Description</label>
+                <textarea id="jobDescription" name="jobDescription" required 
+                    placeholder="Paste the job description here..."></textarea>
+            </div>
+            
+            <div class="button-group">
+                <button type="submit" id="submitBtn">Generate Resume & Cover Letter</button>
+            </div>
+        </form>
+
+        <div id="error" class="error"></div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Generating your documents... This may take a moment.</p>
+        </div>
+
+        <div id="output" class="output">
+            <h2>Generated Documents</h2>
+            <div class="button-group">
+                <button onclick="downloadDocument('resume', 'docx')">Download Resume (DOCX)</button>
+                <button onclick="downloadDocument('cover', 'docx')">Download Cover Letter (DOCX)</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:5000';
+        const form = document.getElementById('resumeForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const output = document.getElementById('output');
+        const error = document.getElementById('error');
+
+        function showError(message) {
+            error.textContent = message;
+            error.style.display = 'block';
+            loading.style.display = 'none';
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Reset UI states
+            error.style.display = 'none';
+            output.style.display = 'none';
+            submitBtn.disabled = true;
+            loading.style.display = 'block';
+            
+            const formData = new FormData();
+            const resumeFile = document.getElementById('resume').files[0];
+            const jobDescription = document.getElementById('jobDescription').value;
+
+            if (!resumeFile) {
+                showError('Please select a resume file');
+                submitBtn.disabled = false;
+                return;
+            }
+
+            if (!jobDescription) {
+                showError('Please enter a job description');
+                submitBtn.disabled = false;
+                return;
+            }
+
+            formData.append('resume', resumeFile);
+            formData.append('jobDescription', jobDescription);
+            
+            try {
+                const response = await fetch(`${API_BASE}/generate`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'An error occurred while generating documents');
+                }
+                
+                loading.style.display = 'none';
+                output.style.display = 'block';
+                
+            } catch (err) {
+                showError(err.message || 'An error occurred. Please try again.');
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+
+        function downloadDocument(type, format) {
+            window.location.href = `${API_BASE}/download/${type}/${format}`;
+        }
+    </script>
+</body>
+</html>
