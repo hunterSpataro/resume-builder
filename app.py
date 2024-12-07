@@ -79,11 +79,11 @@ class ResumeBuilder:
 
             Format & Structure:
                - Include complete header with:
-                  * My full name
+                  * My full name (from my resume)
                   * Company name and address
                   * Date
                   * Hiring manager's name/title (if provided)
-                  * My contact information
+                  * My contact information (from my resume)
                - Use standard business letter formatting
                - Length: Approximately 220 words for the main content
 
